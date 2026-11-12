@@ -1,0 +1,104 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    function isValidTransaction(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.amount is number && data.amount >= 0 &&
+             (data.type == 'expense' || data.type == 'income') &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidCategory(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidCreditCard(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidFixedExpense(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.amount is number && data.amount >= 0 &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidProfile(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.userId == request.auth.uid;
+    }
+
+    // User Subcollections
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Financial Profiles / Multiple accounts per Google user
+      match /profiles/{profileId} {
+        allow get, list, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(profileId) && isValidProfile(request.resource.data);
+
+        match /transactions/{transactionId} {
+          allow get, list, delete: if isOwner(userId);
+          allow create, update: if isOwner(userId) && isValidId(transactionId) && isValidTransaction(request.resource.data);
+        }
+
+        match /categories/{categoryId} {
+          allow get, list, delete: if isOwner(userId);
+          allow create, update: if isOwner(userId) && isValidId(categoryId) && isValidCategory(request.resource.data);
+        }
+
+        match /creditCards/{creditCardId} {
+          allow get, list, delete: if isOwner(userId);
+          allow create, update: if isOwner(userId) && isValidId(creditCardId) && isValidCreditCard(request.resource.data);
+        }
+
+        match /fixedExpenses/{fixedExpenseId} {
+          allow get, list, delete: if isOwner(userId);
+          allow create, update: if isOwner(userId) && isValidId(fixedExpenseId) && isValidFixedExpense(request.resource.data);
+        }
+      }
+
+      match /transactions/{transactionId} {
+        allow get, list, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(transactionId) && isValidTransaction(request.resource.data);
+      }
+
+      match /categories/{categoryId} {
+        allow get, list, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(categoryId) && isValidCategory(request.resource.data);
+      }
+
+      match /creditCards/{creditCardId} {
+        allow get, list, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(creditCardId) && isValidCreditCard(request.resource.data);
+      }
+
+      match /fixedExpenses/{fixedExpenseId} {
+        allow get, list, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(fixedExpenseId) && isValidFixedExpense(request.resource.data);
+      }
+    }
+  }
+}
+

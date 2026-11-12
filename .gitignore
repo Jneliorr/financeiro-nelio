@@ -1,0 +1,15 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Arquivos locais do Android Studio e chaves de assinatura
+/android/.idea/
+*.jks
+*.keystore
+*.p12
+*.pfx

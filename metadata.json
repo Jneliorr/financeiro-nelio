@@ -1,0 +1,6 @@
+{
+  "name": "Nelio R$",
+  "description": "Aplicativo para lançamento rápido de despesas integrado ao Firebase Firestore em tempo real, suporte a múltiplas contas/perfis por usuário Google, controle de cartões de crédito, parcelamentos, gastos fixos e exportação para planilhas Excel.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

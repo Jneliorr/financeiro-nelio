@@ -1,0 +1,304 @@
+{
+  "entities": {
+    "Transaction": {
+      "title": "Transaction",
+      "description": "A financial expense or income record",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID for the transaction"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the transaction",
+          "maxLength": 300
+        },
+        "merchant": {
+          "type": "string",
+          "description": "Merchant or establishment name",
+          "maxLength": 200
+        },
+        "amount": {
+          "type": "number",
+          "description": "Transaction monetary amount in BRL"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["expense", "income"],
+          "description": "Type of transaction: expense or income"
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Referenced category ID"
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of transaction (YYYY-MM-DD)",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["pix", "credit", "debit", "cash", "transfer", "other"],
+          "description": "Payment method used"
+        },
+        "creditCardId": {
+          "type": "string",
+          "description": "Referenced credit card ID if paymentMethod is credit"
+        },
+        "tags": {
+          "type": "array",
+          "description": "List of custom tags"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes or details",
+          "maxLength": 1000
+        },
+        "isFixed": {
+          "type": "boolean",
+          "description": "Flag indicating if this was generated from a recurring fixed expense"
+        },
+        "fixedExpenseId": {
+          "type": "string",
+          "description": "Reference to parent fixed expense if applicable"
+        },
+        "installments": {
+          "type": "object",
+          "description": "Installment details if part of an installment purchase"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp ISO string"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID"
+        }
+      },
+      "required": ["id", "description", "amount", "type", "categoryId", "date", "paymentMethod", "userId"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Spending or income category",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID for the category"
+        },
+        "name": {
+          "type": "string",
+          "description": "Category display name",
+          "maxLength": 100
+        },
+        "icon": {
+          "type": "string",
+          "description": "Lucide icon name",
+          "maxLength": 50
+        },
+        "color": {
+          "type": "string",
+          "description": "Hex color code for the category badge",
+          "pattern": "^#[a-fA-F0-9]{6}$"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["expense", "income"],
+          "description": "Category type"
+        },
+        "monthlyBudget": {
+          "type": "number",
+          "description": "Optional monthly budget target"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID"
+        }
+      },
+      "required": ["id", "name", "icon", "color", "type", "userId"]
+    },
+    "CreditCard": {
+      "title": "CreditCard",
+      "description": "User credit card definition",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID for the card"
+        },
+        "name": {
+          "type": "string",
+          "description": "Card title (e.g., Nubank, XP)",
+          "maxLength": 100
+        },
+        "closingDay": {
+          "type": "number",
+          "description": "Invoice closing day of month (1-31)"
+        },
+        "dueDay": {
+          "type": "number",
+          "description": "Invoice due day of month (1-31)"
+        },
+        "limit": {
+          "type": "number",
+          "description": "Optional total credit limit"
+        },
+        "color": {
+          "type": "string",
+          "description": "Card visual branding color",
+          "pattern": "^#[a-fA-F0-9]{6}$"
+        },
+        "closedInvoices": {
+          "type": "array",
+          "description": "List of month keys (YYYY-MM) with manually closed invoices"
+        },
+        "manualClosingDates": {
+          "type": "object",
+          "description": "Mapping of month keys to manual closing ISO/date strings"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID"
+        }
+      },
+      "required": ["id", "name", "closingDay", "dueDay", "color", "userId"]
+    },
+    "FixedExpense": {
+      "title": "FixedExpense",
+      "description": "Monthly recurring fixed expense or income",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of fixed bill",
+          "maxLength": 300
+        },
+        "merchant": {
+          "type": "string",
+          "description": "Service or provider name",
+          "maxLength": 200
+        },
+        "amount": {
+          "type": "number",
+          "description": "Fixed amount in BRL"
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Associated category"
+        },
+        "dueDay": {
+          "type": "number",
+          "description": "Day of the month it is due (1-31)"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "description": "Default payment method"
+        },
+        "creditCardId": {
+          "type": "string",
+          "description": "Credit card reference if charged to card"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether recurring bill is active"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["expense", "income"],
+          "description": "Fixed expense or fixed income"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID"
+        }
+      },
+      "required": ["id", "description", "amount", "categoryId", "dueDay", "paymentMethod", "active", "type", "userId"]
+    },
+    "FinancialProfile": {
+      "title": "FinancialProfile",
+      "description": "User sub-account / financial profile (e.g., Pessoal, Esposa, Empresa)",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID for the financial profile"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the profile/account",
+          "maxLength": 100
+        },
+        "color": {
+          "type": "string",
+          "description": "Color theme hex code",
+          "pattern": "^#[a-fA-F0-9]{6}$"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Icon identifier"
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional notes or member description",
+          "maxLength": 300
+        },
+        "isDefault": {
+          "type": "boolean",
+          "description": "Whether this is the primary default profile"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp ISO string"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID"
+        }
+      },
+      "required": ["id", "name", "color", "icon", "userId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/profiles/{profileId}": {
+      "schema": { "$ref": "#/entities/FinancialProfile" },
+      "description": "Financial profiles/sub-accounts under the Google account"
+    },
+    "/users/{userId}/profiles/{profileId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "Profile financial transactions"
+    },
+    "/users/{userId}/profiles/{profileId}/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Profile customizable spending categories"
+    },
+    "/users/{userId}/profiles/{profileId}/creditCards/{creditCardId}": {
+      "schema": { "$ref": "#/entities/CreditCard" },
+      "description": "Profile credit cards"
+    },
+    "/users/{userId}/profiles/{profileId}/fixedExpenses/{fixedExpenseId}": {
+      "schema": { "$ref": "#/entities/FixedExpense" },
+      "description": "Profile recurring monthly fixed expenses"
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "User financial transactions (legacy/primary)"
+    },
+    "/users/{userId}/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "User customizable spending categories (legacy/primary)"
+    },
+    "/users/{userId}/creditCards/{creditCardId}": {
+      "schema": { "$ref": "#/entities/CreditCard" },
+      "description": "User credit cards (legacy/primary)"
+    },
+    "/users/{userId}/fixedExpenses/{fixedExpenseId}": {
+      "schema": { "$ref": "#/entities/FixedExpense" },
+      "description": "User recurring monthly fixed expenses (legacy/primary)"
+    }
+  }
+}
